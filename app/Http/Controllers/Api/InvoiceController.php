@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Invoice;
@@ -14,20 +15,14 @@ class InvoiceController extends Controller
     {
         $data = Invoice::orderBy('created_at', 'DESC')->get();
 
-        return response()->json([
-            'message' => 'Berhasil mengambil data',
-            'data' => $data,
-        ]);
+        return ResponseFormatter::success($data);
     }
 
     public function getByCustomer($customer)
     {
         $data = Invoice::where('customer_id', $customer)->orderBy('created_at', 'DESC')->get();
 
-        return response()->json([
-            'message' => 'Berhasil mengambil data',
-            'data' => $data,
-        ]);
+        return ResponseFormatter::success($data);
     }
 
     public function bulkInvoice($token)
@@ -74,9 +69,6 @@ class InvoiceController extends Controller
             'price_in' => $invoice->price_in + $data['price'],
         ]);
 
-        return response()->json([
-            'message' => 'Berhasil mengambil data',
-            'data' => $data,
-        ]);
+        return ResponseFormatter::success($invoice);
     }
 }

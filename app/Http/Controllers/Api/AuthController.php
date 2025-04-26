@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -12,23 +13,25 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        try {
+            $request->validate([
+                'email' => ['required', 'email'],
+                'password' => ['required'],
+            ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            if (!Auth::attempt($request->only('email', 'password'))) {
+                return ResponseFormatter::error(null, 'Email atau Kata Sandi anda salah!', 401);
+            }
+
+            $user = Auth::user();
+
+            return ResponseFormatter::success([
+                'token' => $user->createToken("API TOKEN")->plainTextToken,
+                'user' => $user,
+            ]);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage);
         }
-
-        $user = Auth::user();
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Login berhasil',
-            'token' => $token,
-            'data' => $user
-        ]);
     }
 
     public function updatePassword(Request $request)
@@ -41,23 +44,20 @@ class AuthController extends Controller
         $user = User::where('id', Auth::user()->id)->first();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return redirect()->back()->with('danger', 'Password lama tidak sesuai');
+            return ResponseFormatter::error(null, 'Password lama tidak sesuai');
         }
 
         $user->update([
             'password' => Hash::make($request->new_password),
         ]);
 
-        return redirect('/settings')->with('success', 'Password diperbarui');
+        return ResponseFormatter::success($user);
     }
 
     public function user()
     {
         $user = Auth::user();
 
-        return response()->json([
-            'message' => 'Data user',
-            'data' => $user
-        ]);
+        return ResponseFormatter::success($user);
     }
 }

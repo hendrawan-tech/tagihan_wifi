@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Package;
 use Illuminate\Http\Request;
@@ -11,10 +12,7 @@ class PackageController extends Controller
     public function index()
     {
         $data = Package::all();
-        return response()->json([
-            'message' => 'Berhasil mengabil data desa',
-            'data' => $data
-        ]);
+        return ResponseFormatter::success($data);
     }
 
     public function store(Request $request)
@@ -28,9 +26,7 @@ class PackageController extends Controller
 
         Package::create($data);
 
-        return response()->json([
-            'message' => 'Berhasil menambah data',
-        ]);
+        return ResponseFormatter::success($data);
     }
 
     public function update(Request $request, Package $package)
@@ -44,17 +40,13 @@ class PackageController extends Controller
 
         $package->update($data);
 
-        return response()->json([
-            'message' => 'Berhasil mengubah data',
-        ]);
+        return ResponseFormatter::success($package);
     }
 
     public function destroy(Package $package)
     {
         $package->delete();
 
-        return response()->json([
-            'message' => 'Berhasil menghapus data',
-        ]);
+        return ResponseFormatter::success($package);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
@@ -11,10 +12,7 @@ class CustomerController extends Controller
     public function index()
     {
         $data = Customer::all();
-        return response()->json([
-            'message' => 'Berhasil mengabil data desa',
-            'data' => $data
-        ]);
+        return ResponseFormatter::success($data);
     }
 
     public function store(Request $request)
@@ -27,9 +25,7 @@ class CustomerController extends Controller
 
         Customer::create($data);
 
-        return response()->json([
-            'message' => 'Berhasil menambah data',
-        ]);
+        return ResponseFormatter::success($data);
     }
 
     public function update(Request $request, Customer $customer)
@@ -42,17 +38,13 @@ class CustomerController extends Controller
 
         $customer->update($data);
 
-        return response()->json([
-            'message' => 'Berhasil mengubah data',
-        ]);
+        return ResponseFormatter::success($customer);
     }
 
     public function destroy(Customer $customer)
     {
         $customer->delete();
 
-        return response()->json([
-            'message' => 'Berhasil menghapus data',
-        ]);
+        return ResponseFormatter::success($customer);
     }
 }
