@@ -1,0 +1,10 @@
+API :
+    - login
+    - crud package
+    - crud village
+    - crud customer
+        - list by village
+    - invoice
+        - generate
+        - post payment
+        - list by customer
