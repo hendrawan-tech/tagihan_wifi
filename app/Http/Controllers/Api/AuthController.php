@@ -36,28 +36,36 @@ class AuthController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $request->validate([
-            'current_password' => ['required'],
-            'new_password' => ['required', 'min:8', 'confirmed'],
-        ]);
+        try {
+            $request->validate([
+                'current_password' => ['required'],
+                'new_password' => ['required', 'min:8', 'confirmed'],
+            ]);
 
-        $user = User::where('id', Auth::user()->id)->first();
+            $user = User::where('id', Auth::user()->id)->first();
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return ResponseFormatter::error(null, 'Password lama tidak sesuai');
+            if (!Hash::check($request->current_password, $user->password)) {
+                return ResponseFormatter::error(null, 'Password lama tidak sesuai');
+            }
+
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            return ResponseFormatter::success($user);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage);
         }
-
-        $user->update([
-            'password' => Hash::make($request->new_password),
-        ]);
-
-        return ResponseFormatter::success($user);
     }
 
     public function user()
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        return ResponseFormatter::success($user);
+            return ResponseFormatter::success($user);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage);
+        }
     }
 }

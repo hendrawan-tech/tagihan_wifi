@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('code');
             $table->string('price', 10);
             $table->string('price_in', 10);
-            $table->enum('status', ['Belum Lunas', 'Lunas']);
+            $table->string('discount', 10)->default('0');
+            $table->enum('status', ['Belum Lunas', 'Konfirmasi', 'Lunas']);
             $table->unsignedBigInteger('customer_id');
             $table
                 ->foreign('customer_id')

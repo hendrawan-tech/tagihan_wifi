@@ -9,38 +9,65 @@ use Illuminate\Http\Request;
 
 class VillageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Village::all();
-        return ResponseFormatter::success($data);
+        try {
+            $query = Village::query();
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->has('search') && $request->search != '') {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            }
+
+            $data = $query->orderBy('name', 'ASC')->get();
+
+            return ResponseFormatter::success($data);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'required',
+            ]);
 
-        Village::create($data);
+            Village::create($data);
 
-        return ResponseFormatter::success($data);
+            return ResponseFormatter::success($data);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 
     public function update(Request $request, Village $village)
     {
-        $data = $request->validate([
-            'name' => 'required',
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'required',
+            ]);
 
-        $village->update($data);
+            $village->update($data);
 
-        return ResponseFormatter::success($village);
+            return ResponseFormatter::success($village);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 
     public function destroy(Village $village)
     {
-        $village->delete();
+        try {
+            $village->delete();
 
-        return ResponseFormatter::success($village);
+            return ResponseFormatter::success($village);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 }

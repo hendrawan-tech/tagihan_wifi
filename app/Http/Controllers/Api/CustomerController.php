@@ -9,42 +9,88 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Customer::all();
-        return ResponseFormatter::success($data);
+        try {
+            $query = Customer::query();
+
+            if ($request->has('status') && $request->status != '') {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->has('search') && $request->search != '') {
+                $search = $request->search;
+
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
+            }
+
+            $perPage = $request->get('per_page', 10);
+            $query->with(['village', 'package'])
+                ->withCount(['invoicesLunas', 'invoicesBelumLunas', 'invoicesKonfirmasi']);
+            $data = $query->orderBy('name', 'ASC')->paginate($perPage);
+
+            return ResponseFormatter::success($data);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
+    }
+
+    public function show(Customer $customer)
+    {
+        try {
+            $customer->load(['village', 'package']);
+            $customer->loadCount(['invoicesLunas', 'invoicesBelumLunas', 'invoicesKonfirmasi']);
+
+            return ResponseFormatter::success($customer);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'village_id' => 'required',
-            'package_id' => 'required',
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'required',
+                'village_id' => 'required',
+                'package_id' => 'required',
+            ]);
 
-        Customer::create($data);
+            Customer::create($data);
 
-        return ResponseFormatter::success($data);
+            return ResponseFormatter::success($data);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 
     public function update(Request $request, Customer $customer)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'village_id' => 'required',
-            'package_id' => 'required',
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'required',
+                'village_id' => 'required',
+                'package_id' => 'required',
+            ]);
 
-        $customer->update($data);
+            $customer->update($data);
 
-        return ResponseFormatter::success($customer);
+            return ResponseFormatter::success($customer);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 
     public function destroy(Customer $customer)
     {
-        $customer->delete();
+        try {
+            $customer->delete();
 
-        return ResponseFormatter::success($customer);
+            return ResponseFormatter::success($customer);
+        } catch (\Throwable $th) {
+            return ResponseFormatter::error(null, $th->getMessage());
+        }
     }
 }

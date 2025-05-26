@@ -24,4 +24,19 @@ class Customer extends Model
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function invoicesLunas()
+    {
+        return $this->hasMany(Invoice::class)->where('status', 'Lunas');
+    }
+
+    public function invoicesBelumLunas()
+    {
+        return $this->hasMany(Invoice::class)->where('status', 'Belum Lunas');
+    }
+
+    public function invoicesKonfirmasi()
+    {
+        return $this->hasMany(Invoice::class)->where('status', 'Konfirmasi');
+    }
 }

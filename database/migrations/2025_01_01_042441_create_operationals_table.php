@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('operationals', function (Blueprint $table) {
             $table->id();
-            $table->enum('status', ['Operasional', 'Perbaikan', 'Alat']);
+            $table->enum('status', ['Operasional', 'Alat', 'Gaji', 'Setoran']);
             $table->string('price', 10);
             $table->text('description');
             $table->unsignedBigInteger('user_id');
