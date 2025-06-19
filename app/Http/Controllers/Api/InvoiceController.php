@@ -125,14 +125,13 @@ class InvoiceController extends Controller
     {
         try {
             $data = $request->validate([
-                'code' => 'required',
                 'price' => 'required',
                 'discount' => 'nullable',
                 'id' => 'required',
             ]);
 
             $discount = $data['discount'] == null ? '0' : $data['discount'];
-            $invoice =  Invoice::where('code', $data['code'])->first();
+            $invoice =  Invoice::where('id', $data['id'])->first();
             $remaining = $invoice->price - $invoice->price_in;
             $status = ($data['price'] >= $remaining - $discount) ? 'Lunas' : 'Belum Lunas';
 
