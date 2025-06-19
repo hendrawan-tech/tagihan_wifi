@@ -128,6 +128,7 @@ class InvoiceController extends Controller
                 'code' => 'required',
                 'price' => 'required',
                 'discount' => 'nullable',
+                'id' => 'required',
             ]);
 
             $discount = $data['discount'] == null ? '0' : $data['discount'];
